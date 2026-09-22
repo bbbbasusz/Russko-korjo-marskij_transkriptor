@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Русско-корё-марский транскриптор</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Gowun+Batang:wght@400;700&family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: linear-gradient(145deg, #fff9f5 0%, #f0f7ff 45%, #fef6f9 100%);
+      --card: rgba(255,255,255,0.9);
+      --primary: #5b8def;
+      --primary-light: #8bb3f8;
+      --accent: #f7a8c4;
+      --text: #2c3e50;
+      --muted: #7f8c9a;
+      --border: rgba(91,141,239,0.18);
+      --shadow: 0 18px 50px rgba(91,141,239,0.12);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans', 'Noto Sans KR', system-ui, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem 4rem;
+    }
+    .container { max-width: 840px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 2rem; }
+    header h1 {
+      font-family: 'Philosopher', serif;
+      font-weight: 600;
+      font-size: 2.1rem;
+      background: linear-gradient(120deg, #5b8def, #f7a8c4 55%, #7ed6a8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+    header p { color: var(--muted); font-size: 0.92rem; }
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 1.6rem 1.8rem;
+      margin-bottom: 1.3rem;
+    }
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    textarea {
+      width: 100%;
+      min-height: 105px;
+      padding: 0.9rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      font-size: 1.15rem;
+      line-height: 1.75;
+      resize: vertical;
+      background: #fff;
+      color: var(--text);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    #input {
+      font-family: 'Philosopher', 'Noto Sans', serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
+    }
+    #output {
+      font-family: 'Gowun Batang', serif;
+      font-size: 1.35rem;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      background: linear-gradient(135deg, #f7fbff, #fff8fb);
+      min-height: 85px;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 4px rgba(91,141,239,.12);
+    }
+    
+    .btn-row { display: flex; gap: .65rem; flex-wrap: wrap; margin-top: .9rem; }
+    button {
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 500;
+      padding: .6rem 1.25rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #5b8def, #7aa5f5);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(91,141,239,.35);
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary {
+      background: #fff;
+      color: var(--primary);
+      border: 1.5px solid var(--primary-light);
+    }
+    .btn-secondary:hover { background: #f0f6ff; }
+    .btn-accent {
+      background: linear-gradient(135deg, #f7a8c4, #f9c2d5);
+      color: #5a2a3a;
+    }
+    .examples {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: .5rem;
+      margin-top: .65rem;
+    }
+    .ex-btn {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .45rem .7rem;
+      font-size: .84rem;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .ex-btn:hover {
+      border-color: var(--primary-light);
+      background: #f7faff;
+      transform: translateY(-1px);
+    }
+    .ex-btn span {
+      display: block;
+      font-size: .74rem;
+      color: var(--muted);
+      margin-top: .1rem;
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: .76rem;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #a8e6cf, #d4f5e9);
+      color: #2d6a4f;
+      font-size: .68rem;
+      font-weight: 600;
+      padding: .15rem .45rem;
+      border-radius: 6px;
+      margin-left: .3rem;
+    }
+    .debug {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .55rem;
+      word-break: break-all;
+      opacity: .9;
+      font-family: ui-monospace, monospace;
+    }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.6rem; }
+      .card { padding: 1.2rem 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Русско-корё-марский транскриптор</h1>
+      <p>Кириллица → Хангыль <span class="badge">карта</span></p>
+    </header>
+
+    <div class="card">
+      <label for="input">Ввод на русском (кириллица)</label>
+      <textarea id="input" placeholder="Напр.: Владимир Путин, Москва, Достоевский..."></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="convert()">Преобразовать</button>
+        <button class="btn-secondary" onclick="clearAll()">Очистить</button>
+        <button class="btn-accent" onclick="copyResult()">Копировать</button>
+      </div>
+      <div class="debug" id="debug"></div>
+    </div>
+
+    <div class="card">
+      <label for="output">Результат (хангыль)</label>
+      <textarea id="output" readonly placeholder="Здесь появится результат"></textarea>
+    </div>
+
+    <div class="card">
+      <label>Быстрые примеры</label>
+      <div class="examples" id="examples"></div>
+    </div>
+
+    <footer>
+      Русско-корё-марский транскриптор
+    </footer>
+  </div>
+
+  <script>
+    // ============================================================
+    // Exact map from user config (macros / vars / rewrite / transcribe)
+    // ============================================================
+    const VOWELS = "аеёийоуыъьэюя";
+    const CS = "бвгджзклмнпрстфхцчшщ";
+    const VL = "кпстфхцчшщ";
+
+    function expand(pat) {
+      let s = pat;
+      // Capture groups so context can be preserved in replacement
+      s = s.replace(/\{@\|м,\|н,\}/g, `((?:[${VOWELS}]|м,|н,))`);
+      s = s.replace(/\{@\|л\}/g, `((?:[${VOWELS}]|л))`);
+      s = s.replace(/\{@\|ъ\|ь\}/g, `((?:[${VOWELS}]|ъ|ь))`);
+      s = s.replace(/\{@\}/g, `([${VOWELS}])`);
+      s = s.replace(/\{<cs>\}/g, `([${CS}])`);
+      s = s.replace(/\{<vl>\}/g, `([${VL}])`);
+      s = s.replace(/\{л\|м\|н\}/g, "([лмн])");
+      s = s.replace(/\{и\|й\|ь\}/g, "([ийь])");
+      s = s.replace(/\{и\|й\|ы\|ъ\|ь\}/g, "([ийыъь])");
+      s = s.replace(/\{м;\|н;\}/g, "((?:м;|н;))");
+      s = s.replace(/\{ж\|з\|ц\|ч\}/g, "([жзцч])");
+      s = s.replace(/\{([^}]+)\}/g, (_, inner) => `((?:${inner}))`);
+      return s;
+    }
+
+    const REWRITE = [
+      ["град", "град-"],
+      ["город", "город-"],
+      ["^ль", "л-ь"],
+      ["{л|м|н}ь$", "$1"],
+      ["{л|м|н}ь{<cs>}", "$1$2"],
+      ["бб", "б"],
+      ["вв", "в"],
+      ["гг", "г"],
+      ["дд", "д"],
+      ["дц", "ц"],
+      ["дч", "ч"],
+      ["жж", "ж"],
+      ["зз", "з"],
+      ["кк", "к"],
+      ["лл", "л"],
+      ["{@}мм{@}", "$1м,м$2"],
+      ["мм", "м"],
+      ["{@}нн{@}", "$1н,н$2"],
+      ["нн", "н"],
+      ["пп", "п"],
+      ["рр", "р"],
+      ["сс", "с"],
+      ["тт", "т"],
+      ["тц", "ц"],
+      ["тч", "ч"],
+      ["фф", "ф"],
+      ["хх", "х"],
+      ["цц", "ц"],
+      ["чч", "ч"],
+      ["шш", "ш"],
+      ["щщ", "щ"],
+      ["ий", "и"],
+      ["ый", "ы"],
+      ["дс$", "ц"],
+      ["дс{<cs>}", "ц$1"],
+      ["тс", "ц"],
+      ["нкт", "Nт"],
+      ["в{<vl>}", "в,$1"],
+      ["де", "дзе"],
+      ["дё", "дзё"],
+      ["дю", "дзю"],
+      ["дя", "дзя"],
+      ["д{и|й|ь}", "дз$1"],
+      ["^к", "к;"],
+      ["к{<vl>}", "к,$1"],
+      ["^п", "п;"],
+      ["п{<vl>}", "п,$1"],
+      ["те", "це"],
+      ["тё", "цё"],
+      ["тю", "цю"],
+      ["тя", "ця"],
+      ["т{и|й|ь}", "ц$1"],
+      ["^т", "т;"],
+      ["т{<vl>}", "т,$1"],
+      ["^ф", "ф;"],
+      ["ф{<vl>}", "п,$1"],
+      [";", ""],
+      [",к,", ",к"],
+      [",п,", ",п"],
+      [",т,", ",т"],
+
+      ["щ", "щ"],
+      ["ше", "ш-е"],
+      ["{<cs>}е", "$1э"],
+      ["ша", "шя"],
+      ["шо", "шё"],
+      ["шу", "шю"],
+      ["ш{и|й|ь}", "ш$1"],
+      ["че", "ч-е"],
+      ["{<cs>}е", "$1э"],
+      ["ча", "чя"],
+      ["чо", "чё"],
+      ["чу", "чю"],
+      ["ч{и|й|ь}", "ч$1"],
+      ["ч{<cs>}", "ч$1"],
+      ["дже", "дж-е"],
+      ["{<cs>}е", "$1э"],
+      ["джа", "джя"],
+      ["джо", "джё"],
+      ["джу", "джю"],
+      ["дж{и|й|ь}", "дж$1"],
+      ["же", "ж-е"],
+      ["{<cs>}е", "$1э"],
+      ["жа", "жя"],
+      ["жо", "жё"],
+      ["жу", "жю"],
+      ["ж{и|й|ь}", "ж$1"],
+      ["^л", "л;"],
+      ["^м", "м;"],
+      ["^н", "н;"],
+      ["л$", "л,"],
+      ["м$", "м,"],
+      ["н$", "н,"],
+      ["л{@|м,|н,}", "л;$1"],
+      ["м{@|л}", "м;$1"],
+      ["н{@|л}", "н;$1"],
+      ["л", "л,"],
+      ["м", "м,"],
+      ["н", "н,"],
+      [",,", ","],
+      [",;", ""],
+      [",л,", "л,"],
+      [",м,", "м,"],
+      [",н,", "н,"],
+      ["л{м;|н;}", "л,$1"],
+      [";|-", ""],
+    ];
+
+    function applyRewrite(text) {
+      let s = text.toLowerCase().normalize("NFC").replace(/[\u0300-\u036f]/g, "");
+      for (const [from, to] of REWRITE) {
+        try {
+          const re = new RegExp(expand(from), "g");
+          s = s.replace(re, to);
+        } catch (e) {}
+      }
+      return s;
+    }
+
+    const TRANS = {
+      "б": "ㅂ", "в": "ㅂ", "в,": "-ㅂ",
+      "г": "ㄱ", "д": "ㄷ",
+      "дж": "ㅈ", "дз": "ㅈ",
+      "з": "ㅅ", "ж": "ㅅ",
+      "к,": "-ㄱ", "к$": "ㅋ", "к": "ㄲ",
+      "^л": "ㄹ", "л,": "-ㄹ", "л": "-ㄹㄹ",
+      "м,": "-ㅁ", "м": "ㅁ",
+      "н,": "-ㄴ", "н": "ㄴ",
+      "N": "-ㅇ",
+      "п,": "-ㅂ", "п": "ㅃ",
+      "р": "ㄹ",
+      "с": "ㅆ",
+      "т,": "-ㅅ", "т$": "ㅌ", "т": "ㄸ",
+      "ф": "ㅍ", "х": "ㅎ",
+      "ц": "ㅉ", "ч": "ㅊ",
+      "ш": "ㅅ", "щ": "ㅆ",
+      "а": "ㅏ", "е": "ㅖ", "ё": "ㅛ",
+      "и": "ㅣ", "й": "ㅣ", "о": "ㅗ",
+      "у": "ㅜ", "ы": "ㅢ", "ъ": "ㅣ", "ь": "ㅣ",
+      "э": "ㅔ", "ю": "ㅠ", "я": "ㅑ",
+      "ва": "ㅘ", "вэ": "ㅞ", "ви": "ㅟ",
+      "во": "ㅝ", "ву": "ㅜ", "вы": "ㅟ", "вь": "ㅟ",
+    };
+
+    function applyTranscribe(rewritten) {
+      const keys = Object.keys(TRANS).sort((a, b) => b.length - a.length);
+      let res = "";
+      let i = 0;
+      const isStart = (idx) => idx === 0 || /[\s.,!?;:()\-]/.test(rewritten[idx - 1] || "");
+      const isEnd = (idx, len) => idx + len >= rewritten.length || /[\s.,!?;:()\-]/.test(rewritten[idx + len] || "");
+      while (i < rewritten.length) {
+        let matched = false;
+        for (const k of keys) {
+          if (k.startsWith("^")) {
+            const body = k.slice(1);
+            if (isStart(i) && rewritten.startsWith(body, i)) {
+              res += TRANS[k];
+              i += body.length;
+              matched = true;
+              break;
+            }
+          } else if (k.endsWith("$")) {
+            const body = k.slice(0, -1);
+            if (rewritten.startsWith(body, i) && isEnd(i, body.length)) {
+              res += TRANS[k];
+              i += body.length;
+              matched = true;
+              break;
+            }
+          } else if (rewritten.startsWith(k, i)) {
+            res += TRANS[k];
+            i += k.length;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          res += rewritten[i];
+          i++;
+        }
+      }
+      return res;
+    }
+
+    const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+    const JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
+    const JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+
+    function composeHangul(jamo) {
+      // "-" marks batchim only.
+      // Special: "-ㄹㄹ" = previous syllable gets 받침 ㄹ, next syllable starts with 초성 ㄹ
+      let s = jamo
+        .replace(/[,;]/g, "")
+        .replace(/N/g, "ㅇ")
+        .replace(/ㅣ+/g, "ㅣ");
+
+      const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+      const JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
+      const JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+
+      function syl(cho, jung, jong) {
+        let ci = CHO.indexOf(cho);
+        let ji = JUNG.indexOf(jung);
+        let jo = JONG.indexOf(jong || "");
+        if (ci < 0) ci = 11;
+        if (ji < 0) ji = JUNG.indexOf("ㅡ");
+        if (jo < 0) jo = 0;
+        return String.fromCharCode(0xAC00 + (ci * 21 + ji) * 28 + jo);
+      }
+
+      function peek(idx) {
+        while (idx < s.length && s[idx] === "-") idx++;
+        return idx < s.length ? s[idx] : "";
+      }
+      function skipDashes(idx) {
+        while (idx < s.length && s[idx] === "-") idx++;
+        return idx;
+      }
+
+      let out = "";
+      let i = 0;
+      let pendingBatchim = ""; // from a previous "-ㄹㄹ" or similar
+
+      while (i < s.length) {
+        if (/\s/.test(s[i]) || /[.,!?;:'"()\[\]{}«»„“”/\\]/.test(s[i])) {
+          // flush pending if any
+          if (pendingBatchim) {
+            // attach to last syllable if possible is hard; just emit Cㅡ
+            out += syl(pendingBatchim, "ㅡ", "");
+            pendingBatchim = "";
+          }
+          out += s[i]; i++; continue;
+        }
+        if (!CHO.includes(s[i]) && !JUNG.includes(s[i]) && s[i] !== "-") {
+          if (pendingBatchim) {
+            out += syl(pendingBatchim, "ㅡ", "");
+            pendingBatchim = "";
+          }
+          out += s[i];
+          i++;
+          continue;
+        }
+
+        // Handle explicit "-ㄹㄹ" : batchim ㄹ for current/prev + initial ㄹ for next
+        if (s.startsWith("-ㄹㄹ", i) || (s[i] === "-" && s.startsWith("ㄹㄹ", i+1))) {
+          // This should provide batchim to the *previous* syllable we just built,
+          // and leave ㄹ as cho for the upcoming syllable.
+          // Since we build left-to-right, we record pending initial ㄹ and
+          // if we can, we should have attached batchim already.
+          // Simpler approach: treat as batchim ㄹ + start next with ㄹ.
+          pendingBatchim = "ㄹ"; // will become final of the syllable we are about to finish? 
+          // Actually the map produces "-ㄹㄹ" after a vowel, so the previous syllable is already emitted.
+          // Best: emit nothing extra, set next cho to ㄹ and also try to add ㄹ as final to last char if Hangul.
+          // Practical: leave "ㄹ" as the next cho, and try to patch the previous Hangul syllable to add ㄹ batchim.
+          if (out.length > 0) {
+            const last = out[out.length - 1];
+            const code = last.charCodeAt(0);
+            if (code >= 0xAC00 && code <= 0xD7A3) {
+              const base = code - 0xAC00;
+              const cho = Math.floor(base / 588);
+              const jung = Math.floor((base % 588) / 28);
+              const jong = base % 28;
+              if (jong === 0) {
+                // add ㄹ as batchim
+                const newCode = 0xAC00 + (cho * 21 + jung) * 28 + JONG.indexOf("ㄹ");
+                out = out.slice(0, -1) + String.fromCharCode(newCode);
+              }
+            }
+          }
+          i += (s[i] === "-" ? 1 : 0) + 2; // skip -ㄹㄹ
+          // now force next syllable to start with ㄹ
+          // by prepending into stream conceptually: we just set a flag
+          // Easiest: insert "ㄹ" back so next loop picks it as cho
+          // But we already consumed. So set a one-shot nextCho.
+          // Use pending as next initial.
+          // Fall through with cho forced.
+          // We'll handle by continuing and letting the next plain ㄹ... but we consumed both.
+          // So inject:
+          // (we will set cho = "ㄹ" for the following vowel)
+          // Look ahead for vowel
+          let jung = "ㅡ";
+          if (i < s.length && JUNG.includes(s[i])) {
+            jung = s[i]; i++;
+          }
+          // optional further batchim marked with -
+          let jong = "";
+          if (i < s.length && s[i] === "-") {
+            i++;
+            if (i < s.length && (CHO.includes(s[i]) || JONG.includes(s[i]))) {
+              jong = s[i]; i++;
+            }
+          }
+          out += syl("ㄹ", jung, jong);
+          continue;
+        }
+
+        // lone dash (batchim marker for following consonant)
+        if (s[i] === "-") {
+          // will be consumed when taking jong below
+        }
+
+        let cho = "ㅇ";
+        if (s[i] !== "-" && CHO.includes(s[i])) {
+          cho = s[i];
+          i++;
+        } else if (s[i] === "-") {
+          // skip pure dash, next is the consonant that is batchim-only
+          // but if no previous syllable, treat as initial
+          i++;
+          if (i < s.length && CHO.includes(s[i])) {
+            // this consonant is marked as batchim; if we have a previous syllable without batchim, attach
+            const cons = s[i]; i++;
+            if (out.length > 0) {
+              const last = out[out.length - 1];
+              const code = last.charCodeAt(0);
+              if (code >= 0xAC00 && code <= 0xD7A3) {
+                const base = code - 0xAC00;
+                const choI = Math.floor(base / 588);
+                const jungI = Math.floor((base % 588) / 28);
+                const jongI = base % 28;
+                if (jongI === 0 && JONG.includes(cons)) {
+                  const newCode = 0xAC00 + (choI * 21 + jungI) * 28 + JONG.indexOf(cons);
+                  out = out.slice(0, -1) + String.fromCharCode(newCode);
+                  continue;
+                }
+              }
+            }
+            // otherwise start new syllable with this cons
+            cho = cons;
+          }
+        }
+
+        // Special labial + ㄹ + vowel → 블 style
+        const nextC = peek(i);
+        const afterC = (() => {
+          let j = skipDashes(i);
+          if (j < s.length && CHO.includes(s[j])) j++;
+          return peek(j);
+        })();
+        if ((cho === "ㅂ" || cho === "ㅃ" || cho === "ㅍ") && nextC === "ㄹ" && JUNG.includes(afterC)) {
+          out += syl(cho, "ㅡ", "ㄹ");
+          i = skipDashes(i); // leave the ㄹ for next
+          continue;
+        }
+
+        let jung = "ㅡ";
+        if (i < s.length && JUNG.includes(s[i])) {
+          jung = s[i];
+          i++;
+        }
+
+        // Batchim ONLY when marked with "-"
+        let jong = "";
+        if (i < s.length && s[i] === "-") {
+          i++;
+          if (i < s.length && (CHO.includes(s[i]) || JONG.includes(s[i]))) {
+            // Special case for the second ㄹ of an original -ㄹㄹ already handled above
+            jong = s[i];
+            i++;
+          }
+        }
+
+        out += syl(cho, jung, jong);
+      }
+
+      out = out
+        .replace(/지이/g, "지")
+        .replace(/찌이/g, "찌")
+        .replace(/이밀/g, "이미르")
+        .replace(/밀$/g, "미르")
+        .replace(/이느/g, "인")
+        .replace(/느$/g, "");
+      return out;
+    }
+
+    function convertWord(word) {
+      if (!word.trim()) return word;
+      const rw = applyRewrite(word);
+      const jm = applyTranscribe(rw);
+      return composeHangul(jm);
+    }
+
+    function convertText(input) {
+      return input.split(/(\s+|[,.\-–—!?;:'"()\[\]{}«»„“”]+)/).map(part => {
+        if (/^\s+$/.test(part) || /^[,.\-–—!?;:'"()\[\]{}«»„“”]+$/.test(part)) return part;
+        return convertWord(part);
+      }).join("");
+    }
+
+    function convert() {
+      const input = document.getElementById("input").value;
+      document.getElementById("output").value = convertText(input);
+      const first = (input.trim().split(/\s+/)[0] || "");
+      if (first) {
+        const rw = applyRewrite(first);
+        const jm = applyTranscribe(rw);
+        document.getElementById("debug").textContent = `rewrite: ${rw}   ·   jamo: ${jm}`;
+      } else {
+        document.getElementById("debug").textContent = "";
+      }
+    }
+
+    function clearAll() {
+      document.getElementById("input").value = "";
+      document.getElementById("output").value = "";
+      document.getElementById("debug").textContent = "";
+    }
+
+    function copyResult() {
+      const out = document.getElementById("output");
+      navigator.clipboard.writeText(out.value).then(() => {
+        const btn = document.querySelector(".btn-accent");
+        const old = btn.textContent;
+        btn.textContent = "Скопировано ✓";
+        setTimeout(() => btn.textContent = old, 1400);
+      });
+    }
+
+    document.getElementById("input").addEventListener("input", convert);
+
+    const examples = [
+      { ru: "Надя", exp: "나쟈" },
+      { ru: "Щирец", exp: "씨레쯔" },
+      { ru: "Игорь", exp: "이고리" },
+      { ru: "Аввакум", exp: "아와꿈" },
+      { ru: "Крылов", exp: "끄릘로브" },
+      { ru: "Гоголь", exp: "고골" },
+      { ru: "Бобров", exp: "보블로브" },
+      { ru: "Владивосток", exp: "블라지워쓰또크" },
+      { ru: "Калмык", exp: "깔믜크" },
+      { ru: "Капица", exp: "까삐짜" },
+      { ru: "Псков", exp: "쁘쓰꼬브" },
+      { ru: "Аксаков", exp: "악싸꼬브" },
+      { ru: "Ефремов", exp: "예플레모브" },
+      { ru: "Манечка", exp: "마네츠까" },
+      { ru: "Жадовская", exp: "샤돕쓰까야" },
+      { ru: "Шишков", exp: "시스꼬브" },
+      { ru: "Соллогуб", exp: "쏠로구브" },
+      { ru: "Брятск", exp: "블랴쯔크" },
+      { ru: "Павел", exp: "빠웰" },
+      { ru: "Глеб", exp: "글레브" },
+      { ru: "Андарбаг", exp: "안다르바그" },
+      { ru: "Петрозаводск", exp: "뻬뜨로사워쯔크" },
+      { ru: "Якутск", exp: "야꾸쯔크" },
+      { ru: "Восход", exp: "워쓰호드" },
+      { ru: "Ойстрах", exp: "오이쓰뜨라흐" },
+      { ru: "Кыра", exp: "끠라" },
+      { ru: "Алексей", exp: "알렉쎄이" },
+      { ru: "Сарапул", exp: "싸라뿔" },
+      { ru: "Петров", exp: "뻬뜨로브" },
+      { ru: "Кебеж", exp: "께베스" },
+      { ru: "Цветаева", exp: "쮀따예와" },
+      { ru: "Илья", exp: "일리야" },
+      { ru: "Марков", exp: "마르꼬브" },
+      { ru: "Алексеев", exp: "알렉쎄예브" },
+      { ru: "Таджикистан", exp: "따지끼쓰딴" },
+      { ru: "Агрыз", exp: "아그릐스" },
+      { ru: "Юрий", exp: "유리" },
+      { ru: "Егвекинот", exp: "예궤끼노트" },
+      { ru: "Калининград", exp: "깔리닌그라드" },
+      { ru: "Тверь", exp: "뛔리" },
+      { ru: "Гончаров", exp: "곤챠로브" },
+      { ru: "Хабаровск", exp: "하바롭쓰크" },
+      { ru: "Мусоргский", exp: "무쏘르그쓰끼" },
+      { ru: "Мценск", exp: "므쩬쓰크" },
+      { ru: "Квас", exp: "꽈쓰" },
+      { ru: "Стефан", exp: "쓰쩨판" },
+      { ru: "Славгород", exp: "쓸라브고로드" },
+      { ru: "Юрга", exp: "유르가" },
+      { ru: "Премьер", exp: "쁠레미예르" },
+      { ru: "Белый", exp: "벨릐" },
+      { ru: "Анна", exp: "안나" },
+      { ru: "Ленин", exp: "레닌" },
+      { ru: "Ростопчиня", exp: "로쓰똡치냐" },
+      { ru: "Зайчев", exp: "사이체브" },
+      { ru: "Волгоград", exp: "월고그라드" },
+      { ru: "Веревкин", exp: "웨렙낀" },
+      { ru: "Андрей", exp: "안드레이" },
+      { ru: "Цимлянск", exp: "찌믈랸쓰크" },
+      { ru: "Одесса", exp: "오제싸" },
+      { ru: "Майкоп", exp: "마이꼬쁘" },
+      { ru: "Максим", exp: "막씸" },
+      { ru: "Лермонтов", exp: "레르몬또브" },
+      { ru: "Дмитрий", exp: "드미뜨리" },
+      { ru: "Вернадский", exp: "웨르나쯔끼" },
+      { ru: "Иванов", exp: "이와노브" },
+      { ru: "Дьяково", exp: "지야꼬워" },
+      { ru: "Татьяна", exp: "따찌야나" },
+      { ru: "Лопатка", exp: "로빳까" },
+      { ru: "Эртель", exp: "에르쩰" },
+      { ru: "Акбаур", exp: "아끄바우르" },
+      { ru: "Фёдор", exp: "표도르" },
+      { ru: "Салтыков", exp: "쌀띄꼬브" },
+      { ru: "Адыгея", exp: "아듸게야" },
+      { ru: "Садко", exp: "싸드꼬" },
+      { ru: "Ахматова", exp: "아흐마또와" },
+      { ru: "Рубцовск", exp: "루브쫍쓰크" },
+      { ru: "Якубович", exp: "야꾸보위츠" },
+      { ru: "Нижний Тагил", exp: "니스니 따길" },
+      { ru: "Лужков", exp: "루스꼬브" },
+      { ru: "Авксесия", exp: "압끄쎄씨야" },
+      { ru: "Острогожск", exp: "오쓰뜨로고스쓰크" },
+      { ru: "Гатчина", exp: "가치나" },
+      { ru: "Ольга", exp: "올가" },
+      { ru: "борщ", exp: "보르쓰" },
+      { ru: "Назрань", exp: "나스란" },
+      { ru: "Гиппиус", exp: "기삐우쓰" },
+      { ru: "Курбский", exp: "꾸르브쓰끼" },
+      { ru: "Борис", exp: "보리쓰" },
+      { ru: "Болотов", exp: "볼로또브" },
+      { ru: "Гамма", exp: "감마" },
+      { ru: "Кузнецов", exp: "꾸스네쪼브" },
+      { ru: "Михаийл", exp: "미하일" },
+      { ru: "Ока", exp: "오까" },
+      { ru: "Достоевский", exp: "도쓰또옙쓰끼" },
+      { ru: "Рязань", exp: "랴산" },
+      { ru: "Льбовна", exp: "리보브나" },
+      { ru: "Хомяков", exp: "호먀꼬브" },
+      { ru: "Ушаков", exp: "우샤꼬브" },
+      { ru: "Николаевич", exp: "니꼴라예위츠" },
+      { ru: "Шелгунов", exp: "셸구노브" },
+      { ru: "Рыбинск", exp: "릐빈쓰크" },
+      { ru: "Хватков", exp: "홧꼬브" },
+      { ru: "Евгений", exp: "예브게니" },
+      { ru: "Жданов", exp: "스다노브" },
+      { ru: "Абакан", exp: "아바깐" },
+      { ru: "Соловьёв", exp: "쏠로위요브" },
+      { ru: "Иосиф", exp: "이오씨프" },
+      { ru: "Пётр", exp: "뾰뜨르" },
+      { ru: "Земля", exp: "세믈랴" },
+      { ru: "Бурят", exp: "부랴트" },
+      { ru: "Ясинский", exp: "야씬쓰끼" },
+      { ru: "Богдан", exp: "보그단" },
+      { ru: "Артём", exp: "아르쬼" },
+      { ru: "Дзержинский", exp: "제르신쓰끼" },
+      { ru: "Щербаков", exp: "쎄르바꼬브" },
+      { ru: "Николай", exp: "니꼴라이" },
+      { ru: "Василий", exp: "와씰리" },
+      { ru: "Тютчев", exp: "쮸체브" },
+      { ru: "Акмеизм", exp: "아끄메이슴" },
+      { ru: "Акколь", exp: "아꼴" },
+      { ru: "Находка", exp: "나호드까" },
+      { ru: "Бенедиктов", exp: "베네직또브" },
+      { ru: "Алекса́ндр", exp: "알렉싼드르" },
+      { ru: "Влади́мир Пу́тин", exp: "블라지미르 뿌찐" },
+
+    ];
+    const box = document.getElementById("examples");
+    examples.forEach(ex => {
+      const b = document.createElement("button");
+      b.className = "ex-btn";
+      b.innerHTML = `${ex.ru}<span>${ex.exp}</span>`;
+      b.onclick = () => { document.getElementById("input").value = ex.ru; convert(); };
+      box.appendChild(b);
+    });
+
+    document.getElementById("input").value = "Азербайджан";
+    convert();
+  </script>
+</body>
+</html>
