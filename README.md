@@ -1,2 +1,2 @@
-# Russko-kor--marskij_transkriptor
+# Russko-korjo--marskij_transkriptor
 Русско-корё-марский транскриптор
